@@ -64,7 +64,7 @@ Group:		Base/Kernel
 
 # git://git.kernel.org/pub/scm/linux/kernel/git/jeremy/xen.git xen/dom0/core
 Source0:	http://xatka.net/~z/PLD/%{name}-%{basever}.tar.bz2
-# Source0-md5:	84c077a37684e4cbfa67b18154390d8a
+# Source0-md5:	eb8fc0005bf72707ddb83d113c372a8c
 %if "%{postver}" != "%{nil}"
 Source1:	http://www.kernel.org/pub/linux/kernel/v2.6/patch-%{version}.bz2
 # Source1-md5:	6cac5e59d5562b591cdda485941204d5
