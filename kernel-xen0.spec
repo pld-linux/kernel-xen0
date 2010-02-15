@@ -1,9 +1,10 @@
 #
 # TODO:
 # - test it
+# - drop non-x86 garbage
 #
 # 2.6.30 status:
-# - builds x86_64
+# - builds x86_64, i686
 #
 # Conditional build:
 %bcond_without	source		# don't build kernel-source package
@@ -117,8 +118,7 @@ Conflicts:	util-linux < 2.10o
 Conflicts:	xfsprogs < 2.6.0
 ExclusiveOS:	Linux
 %{?with_noarch:BuildArch:	noarch}
-# TODO: arm ia64 ppc64 sparc64
-ExclusiveArch:	%{ix86} %{x8664} alpha ppc sparc noarch
+ExclusiveArch:	%{ix86} %{x8664} noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %ifarch %{ix86} %{x8664}
