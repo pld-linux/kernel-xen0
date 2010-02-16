@@ -49,7 +49,7 @@ Epoch:		3
 License:	GPL v2
 Group:		Base/Kernel
 # git://git.kernel.org/pub/scm/linux/kernel/git/jeremy/xen.git xen/dom0/core
-Source0:	http://xatka.net/~z/PLD/%{name}-%{basever}.tar.bz2
+Source0:	http://xatka.net/~z/PLD/%{name}-%{version}.tar.bz2
 # Source0-md5:	eb8fc0005bf72707ddb83d113c372a8c
 Source2:	kernel-xen0-module-build.pl
 Source3:	kernel-config.py
@@ -60,8 +60,8 @@ Source7:	kernel-xen0-multiarch.conf
 Source8:	kernel-xen0-preempt-nort.config
 Source9:	kernel-xen0-no-preempt-nort.config
 URL:		http://www.kernel.org/
-BuildRequires:	binutils >= 3:2.14.90.0.7
 BuildRequires:	%{kgcc_package} >= 5:3.2
+BuildRequires:	binutils >= 3:2.14.90.0.7
 BuildRequires:	module-init-tools
 # for hostname command
 BuildRequires:	net-tools
@@ -92,8 +92,8 @@ Conflicts:	udev < 1:071
 Conflicts:	util-linux < 2.10o
 Conflicts:	xfsprogs < 2.6.0
 ExclusiveOS:	Linux
-ExclusiveArch:	%{ix86} %{x8664}
 Provides:	kernel(xen0)
+ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		target_arch_dir	x86
@@ -125,24 +125,25 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %endif
 
 %define __features Enabled features:\
-%{?debug: - DEBUG}\
+%{?debug:- DEBUG}\
 %define Features %(echo "%{__features}
-%{?with_pae: - PAE (HIGHMEM64G) support}" | sed '/^$/d')
+%{?with_pae:- PAE (HIGHMEM64G) support}" | sed '/^$/d')
 # vim: "
 
 %description
 This package contains the Linux kernel ported to Xen dom0. It acts as
-priviliged Xen guest. That means it may controls other Xen domains.  It
-contains few device drivers for specific hardware.
-Most hardware is instead supported by modules loaded after booting.
+priviliged Xen guest. That means it may controls other Xen domains. It
+contains few device drivers for specific hardware. Most hardware is
+instead supported by modules loaded after booting.
 
 %{Features}
 
 %description -l pl.UTF-8
-Pakiet zawiera jądro Linuksa mogące działać jako Xen dom0. Pozwala ono na
-działanie uprzywilejowanego gościa systemu Xen, który może kontrolować inne
-domeny Xen.  Jądro zawiera w sobie sterowniki do sprzętu znajdującego się w
-komputerze, takiego jak sterowniki dysków itp.
+Pakiet zawiera jądro Linuksa mogące działać jako Xen dom0. Pozwala ono
+na działanie uprzywilejowanego gościa systemu Xen, który może
+kontrolować inne domeny Xen. Jądro zawiera w sobie sterowniki do
+sprzętu znajdującego się w komputerze, takiego jak sterowniki dysków
+itp.
 
 %{Features}
 
@@ -247,7 +248,7 @@ Sterowniki dźwięku OSS (Open Sound System).
 %package firmware
 Summary:	Firmware for Linux kernel drivers
 Summary(pl.UTF-8):	Firmware dla sterowników z jądra Linuksa
-Group:		System Environment/Kernel
+Group:		Base/Kernel
 
 %description firmware
 Firmware for Linux kernel drivers.
@@ -283,8 +284,8 @@ building kernel modules.
 
 %description headers -l de.UTF-8
 Dies sind die C Header Dateien für den Linux-Kernel, die definierte
-Strukturen und Konstante beinhalten, die beim rekompilieren des Kernels
-oder bei Kernel Modul kompilationen gebraucht werden.
+Strukturen und Konstante beinhalten, die beim rekompilieren des
+Kernels oder bei Kernel Modul kompilationen gebraucht werden.
 
 %description headers -l pl.UTF-8
 Pakiet zawiera pliki nagłówkowe jądra, niezbędne do rekompilacji jądra
@@ -537,8 +538,8 @@ fi
 ln -sf initrd-%{kernel_release}.gz %{initrd_dir}/initrd-%{alt_kernel}
 
 if [ -x /sbin/new-kernel-pkg ]; then
-	if [ -f /etc/pld-release ]; then
-		title=$(sed 's/^[0-9.]\+ //' < /etc/pld-release)
+if [ -f %{_sysconfdir}/pld-release ]; then
+title=$(sed 's/^[0-9.]\+ //' < %{_sysconfdir}/pld-release)
 	else
 		title='PLD Linux'
 	fi
@@ -578,14 +579,14 @@ ln -sf vmlinux-%{kernel_release} /boot/vmlinux-%{alt_kernel}
 %depmod %{kernel_release}
 
 %post headers
-rm -f %{_prefix}/src/linux-%{alt_kernel}
-ln -snf %{basename:%{_kernelsrcdir}} %{_prefix}/src/linux-%{alt_kernel}
+rm -f %{_kernelsrcdir}-%{alt_kernel}
+ln -snf %{basename:%{_kernelsrcdir}} %{_kernelsrcdir}-%{alt_kernel}
 
 %postun headers
 if [ "$1" = "0" ]; then
-	if [ -L %{_prefix}/src/linux-%{alt_kernel} ]; then
-		if [ "$(readlink %{_prefix}/src/linux-%{alt_kernel})" = "linux-%{version}_%{alt_kernel}" ]; then
-			rm -f %{_prefix}/src/linux-%{alt_kernel}
+	if [ -L %{_kernelsrcdir}-%{alt_kernel} ]; then
+		if [ "$(readlink %{_kernelsrcdir}-%{alt_kernel})" = "linux-%{version}_%{alt_kernel}" ]; then
+			rm -f %{_kernelsrcdir}-%{alt_kernel}
 		fi
 	fi
 fi
@@ -693,6 +694,7 @@ fi
 %endif			# %{have_sound}
 
 %files firmware
+%defattr(644,root,root,755)
 %dir /lib/firmware/3com
 /lib/firmware/3com/3C359.bin
 /lib/firmware/3com/typhoon.bin
