@@ -8,7 +8,6 @@
 #
 # Conditional build:
 %bcond_without	source		# don't build kernel-source package
-%bcond_with	noarch		# build noarch packages
 %bcond_with	verbose		# verbose build (V=1)
 %bcond_with	pae		# build PAE (HIGHMEM64G) support on uniprocessor
 %bcond_with	preempt-nort	# build preemptable no realtime kernel
@@ -17,10 +16,6 @@
 
 %ifnarch %{ix86}
 %undefine	with_pae
-%endif
-
-%if "%{_arch}" == "noarch"
-%define		with_noarch	1
 %endif
 
 %define		have_isa	1
@@ -117,8 +112,7 @@ Conflicts:	udev < 1:071
 Conflicts:	util-linux < 2.10o
 Conflicts:	xfsprogs < 2.6.0
 ExclusiveOS:	Linux
-%{?with_noarch:BuildArch:	noarch}
-ExclusiveArch:	%{ix86} %{x8664} noarch
+ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %ifarch %{ix86} %{x8664}
@@ -421,7 +415,6 @@ sed -i 's#EXTRAVERSION =.*#EXTRAVERSION = %{postver}_%{alt_kernel}#g' Makefile
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' -o -name '.gitignore' ')' -print0 | xargs -0 -r -l512 rm -f
 
-%if %{without noarch}
 %build
 install -d %{objdir}
 cat > %{targetobj}.mk <<'EOF'
@@ -506,15 +499,11 @@ pykconfig > %{objdir}/.kernel-autogen.conf
 # build reverse config and show diff
 %{__make} TARGETOBJ=%{targetobj} pykconfig
 diff -u %{_sourcedir}/kernel-xen0-multiarch.conf %{objdir}/kernel.conf || :
-%endif # arch build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-# touch for noarch build (exclude list)
 install -d $RPM_BUILD_ROOT%{_kernelsrcdir}/include/linux
-touch $RPM_BUILD_ROOT%{_kernelsrcdir}/include/linux/{utsrelease,version,autoconf-dist}.h
 
-%if %{without noarch}
 %{__make} %{MakeOpts} %{!?with_verbose:-s} modules_install \
 	-C %{objdir} \
 	%{?with_verbose:V=1} \
@@ -560,14 +549,11 @@ touch $RPM_BUILD_ROOT/lib/modules/%{kernel_release}/modules.dep
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/modprobe.d/%{kernel_release}
 
 # /usr/src/linux
-# maybe package these to -module-build, then -headers could be noarch
 cp -a %{objdir}/Module.symvers $RPM_BUILD_ROOT%{_kernelsrcdir}/Module.symvers-dist
 cp -aL %{objdir}/.config $RPM_BUILD_ROOT%{_kernelsrcdir}/config-dist
 cp -a %{objdir}/include/linux/autoconf.h $RPM_BUILD_ROOT%{_kernelsrcdir}/include/linux/autoconf-dist.h
 cp -a %{objdir}/include/linux/{utsrelease,version}.h $RPM_BUILD_ROOT%{_kernelsrcdir}/include/linux
-%endif # arch dependant
 
-%if %{with noarch}
 # test if we can hardlink -- %{_builddir} and $RPM_BUILD_ROOT on same partition
 if cp -al %{srcdir}/COPYING $RPM_BUILD_ROOT/COPYING 2>/dev/null; then
 	l=l
@@ -577,7 +563,6 @@ cp -a$l %{srcdir}/* $RPM_BUILD_ROOT%{_kernelsrcdir}
 
 install -d $RPM_BUILD_ROOT/lib/modules/%{kernel_release}
 cp -a %{SOURCE6} $RPM_BUILD_ROOT%{_kernelsrcdir}/include/linux/config.h
-%endif # arch independant
 
 # collect module-build files and directories
 # Usage: kernel-module-build.pl $rpmdir $fileoutdir
@@ -671,7 +656,6 @@ if [ "$1" = "0" ]; then
 	rm -f /lib/modules/%{kernel_release}/{build,source}
 fi
 
-%if %{without noarch}
 %files
 %defattr(644,root,root,755)
 %ifarch sparc sparc64
@@ -890,9 +874,7 @@ fi
 %{_kernelsrcdir}/include/linux/autoconf-dist.h
 %{_kernelsrcdir}/include/linux/utsrelease.h
 %{_kernelsrcdir}/include/linux/version.h
-%endif # noarch package
 
-%if %{with noarch}
 %files headers
 %defattr(644,root,root,755)
 %{_kernelsrcdir}/include
@@ -994,5 +976,4 @@ fi
 %{_kernelsrcdir}/MAINTAINERS
 %{_kernelsrcdir}/README
 %{_kernelsrcdir}/REPORTING-BUGS
-%endif
 %endif
