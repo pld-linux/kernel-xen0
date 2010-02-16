@@ -2,6 +2,9 @@
 # TODO:
 # - test it
 # - drop non-x86 garbage
+# - warning: Installed (but unpackaged) file(s) found:
+#   /usr/src/linux-2.6.30_xen0/arch/m68k/install.sh
+#   /usr/src/linux-2.6.30_xen0/tools/perf/*
 #
 # 2.6.30 status:
 # - builds x86_64, i686
