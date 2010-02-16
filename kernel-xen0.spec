@@ -96,6 +96,7 @@ Conflicts:	util-linux < 2.10o
 Conflicts:	xfsprogs < 2.6.0
 ExclusiveOS:	Linux
 ExclusiveArch:	%{ix86} %{x8664}
+Provides:	kernel(xen0)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		target_arch_dir	x86
