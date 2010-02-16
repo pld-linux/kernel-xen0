@@ -1,7 +1,6 @@
 #
 # TODO:
 # - test it
-# - drop non-x86 garbage
 # - warning: Installed (but unpackaged) file(s) found:
 #   /usr/src/linux-2.6.30_xen0/arch/m68k/install.sh
 #   /usr/src/linux-2.6.30_xen0/tools/perf/*
@@ -27,14 +26,7 @@
 %define		have_sound	1
 %define		have_drm	1
 
-%ifnarch %{ix86} alpha ppc
 %define		have_isa	0
-%endif
-%ifarch sparc sparc64
-%define		have_drm	0
-%define		have_oss	0
-%define		have_pcmcia	0
-%endif
 
 %define		alt_kernel	xen0
 
@@ -78,9 +70,6 @@ Source8:	kernel-xen0-preempt-nort.config
 Source9:	kernel-xen0-no-preempt-nort.config
 URL:		http://www.kernel.org/
 BuildRequires:	binutils >= 3:2.14.90.0.7
-%ifarch sparc sparc64
-BuildRequires:	elftoaout
-%endif
 BuildRequires:	%{kgcc_package} >= 5:3.2
 BuildRequires:	module-init-tools
 # for hostname command
@@ -90,9 +79,6 @@ BuildRequires:	python
 BuildRequires:	python-modules
 BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRequires:	sed >= 4.0
-%ifarch ppc
-BuildRequires:	uboot-mkimage
-%endif
 Autoreqprov:	no
 Requires:	/sbin/depmod
 Requires:	coreutils
@@ -118,11 +104,7 @@ ExclusiveOS:	Linux
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%ifarch %{ix86} %{x8664}
 %define		target_arch_dir	x86
-%else
-%define		target_arch_dir	%{_target_base_arch}
-%endif
 
 # No ELF objects there to strip (skips processing 27k files)
 %define		_noautostrip	.*%{_kernelsrcdir}/.*
@@ -522,24 +504,7 @@ touch $RPM_BUILD_ROOT/lib/modules/%{kernel_release}/{build,source}
 install -d $RPM_BUILD_ROOT/boot
 cp -a %{objdir}/System.map $RPM_BUILD_ROOT/boot/System.map-%{kernel_release}
 install %{objdir}/vmlinux $RPM_BUILD_ROOT/boot/vmlinux-%{kernel_release}
-%ifarch %{ix86} %{x8664}
 cp -a %{objdir}/arch/%{target_arch_dir}/boot/bzImage $RPM_BUILD_ROOT/boot/vmlinuz-%{kernel_release}
-%endif
-%ifarch ppc ppc64
-install %{objdir}/vmlinux $RPM_BUILD_ROOT/boot/vmlinuz-%{kernel_release}
-%endif
-%ifarch alpha sparc sparc64
-	%{__gzip} -cfv %{objdir}/vmlinux > %{objdir}/vmlinuz
-	cp -a %{objdir}/vmlinuz $RPM_BUILD_ROOT/boot/vmlinuz-%{kernel_release}
-%ifarch sparc
-	elftoaout %{objdir}/arch/sparc/boot/image -o %{objdir}/vmlinux.aout
-	install %{objdir}/vmlinux.aout $RPM_BUILD_ROOT/boot/vmlinux.aout-%{kernel_release}
-%endif
-%ifarch sparc64
-	elftoaout %{objdir}/arch/sparc64/boot/image -o %{objdir}/vmlinux.aout
-	install %{objdir}/vmlinux.aout $RPM_BUILD_ROOT/boot/vmlinux.aout-%{kernel_release}
-%endif
-%endif # ifarch alpha sparc sparc64
 
 # for initrd
 touch $RPM_BUILD_ROOT/boot/initrd-%{kernel_release}.gz
@@ -661,9 +626,6 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%ifarch sparc sparc64
-/boot/vmlinux.aout-%{kernel_release}
-%endif
 /boot/vmlinuz-%{kernel_release}
 /boot/System.map-%{kernel_release}
 %ghost /boot/initrd-%{kernel_release}.gz
@@ -709,11 +671,9 @@ fi
 %defattr(644,root,root,755)
 %dir %{_kernelsrcdir}
 
-%ifarch alpha %{ix86} %{x8664} ppc ppc64 sparc sparc64
 %files vmlinux
 %defattr(644,root,root,755)
 /boot/vmlinux-%{kernel_release}
-%endif
 
 %if %{have_drm}
 %files drm
@@ -848,7 +808,7 @@ fi
 /lib/firmware/tigon/tg3_tso5.bin
 /lib/firmware/ti_3410.fw
 /lib/firmware/ti_5052.fw
-%ifarch %{ix86} ppc
+%ifarch %{ix86}
 /lib/firmware/tr_smctr.bin
 %endif
 %dir /lib/firmware/ttusb-budget
@@ -896,9 +856,6 @@ fi
 %files module-build -f aux_files
 %defattr(644,root,root,755)
 %{_kernelsrcdir}/Kbuild
-%ifarch ppc ppc64
-%{_kernelsrcdir}/arch/powerpc/lib/crtsavres.*
-%endif
 %{_kernelsrcdir}/arch/*/kernel/asm-offsets*
 %{_kernelsrcdir}/arch/*/kernel/sigframe*.h
 %{_kernelsrcdir}/drivers/lguest/lg.h
@@ -938,9 +895,6 @@ fi
 %{_kernelsrcdir}/arch/x86/ia32/[!M]*
 %{_kernelsrcdir}/arch/ia64/kvm
 %{_kernelsrcdir}/arch/powerpc/kvm
-%ifarch ppc ppc64
-%exclude %{_kernelsrcdir}/arch/powerpc/lib/crtsavres.*
-%endif
 %{_kernelsrcdir}/arch/s390/kvm
 %{_kernelsrcdir}/arch/x86/kvm
 %exclude %{_kernelsrcdir}/arch/*/kernel/asm-offsets*
