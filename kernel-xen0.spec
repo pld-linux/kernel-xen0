@@ -40,11 +40,8 @@
 %define		basever	2.6.30
 %define		rel		0.1
 
-Summary:	The Linux kernel (the core of the Linux operating system)
-Summary(de.UTF-8):	Der Linux-Kernel (Kern des Linux-Betriebssystems)
-Summary(et.UTF-8):	Linuxi kernel (ehk operatsioonisüsteemi tuum)
-Summary(fr.UTF-8):	Le Kernel-Linux (La partie centrale du systeme)
-Summary(pl.UTF-8):	Jądro Linuksa
+Summary:	The Linux kernel with Xen dom0 support
+Summary(pl.UTF-8):	Jądro Linuksa ze obsługą Xen dom0
 Name:		kernel-%{alt_kernel}
 Version:	%{basever}
 Release:	%{rel}
@@ -134,32 +131,18 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # vim: "
 
 %description
-This package contains the Linux kernel that is used to boot and run
-your system. It contains few device drivers for specific hardware.
+This package contains the Linux kernel ported to Xen dom0. It acts as
+priviliged Xen guest. That means it may controls other Xen domains.  It
+contains few device drivers for specific hardware.
 Most hardware is instead supported by modules loaded after booting.
 
 %{Features}
 
-%description -l de.UTF-8
-Das Kernel-Packet enthält den Linux-Kernel (vmlinuz), den Kern des
-Linux-Betriebssystems. Der Kernel ist für grundliegende
-Systemfunktionen verantwortlich: Speicherreservierung,
-Prozeß-Management, Geräte Ein- und Ausgaben, usw.
-
-%{Features}
-
-%description -l fr.UTF-8
-Le package kernel contient le kernel linux (vmlinuz), la partie
-centrale d'un système d'exploitation Linux. Le noyau traite les
-fonctions basiques d'un système d'exploitation: allocation mémoire,
-allocation de process, entrée/sortie de peripheriques, etc.
-
-%{Features}
-
 %description -l pl.UTF-8
-Pakiet zawiera jądro Linuksa niezbędne do prawidłowego działania
-Twojego komputera. Zawiera w sobie sterowniki do sprzętu znajdującego
-się w komputerze, takiego jak sterowniki dysków itp.
+Pakiet zawiera jądro Linuksa mogące działać jako Xen dom0. Pozwala ono na
+działanie uprzywilejowanego gościa systemu Xen, który może kontrolować inne
+domeny Xen.  Jądro zawiera w sobie sterowniki do sprzętu znajdującego się w
+komputerze, takiego jak sterowniki dysków itp.
 
 %{Features}
 
