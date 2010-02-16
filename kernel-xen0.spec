@@ -38,7 +38,6 @@
 %define		_kernelsrcdir	/usr/src/linux-%{version}_%{alt_kernel}
 
 %define		basever	2.6.30
-%define		postver	%{nil}
 %define		rel		0.1
 
 Summary:	The Linux kernel (the core of the Linux operating system)
@@ -47,19 +46,14 @@ Summary(et.UTF-8):	Linuxi kernel (ehk operatsioonisüsteemi tuum)
 Summary(fr.UTF-8):	Le Kernel-Linux (La partie centrale du systeme)
 Summary(pl.UTF-8):	Jądro Linuksa
 Name:		kernel-%{alt_kernel}
-Version:	%{basever}%{postver}
+Version:	%{basever}
 Release:	%{rel}
 Epoch:		3
 License:	GPL v2
 Group:		Base/Kernel
-
 # git://git.kernel.org/pub/scm/linux/kernel/git/jeremy/xen.git xen/dom0/core
 Source0:	http://xatka.net/~z/PLD/%{name}-%{basever}.tar.bz2
 # Source0-md5:	eb8fc0005bf72707ddb83d113c372a8c
-%if "%{postver}" != "%{nil}"
-Source1:	http://www.kernel.org/pub/linux/kernel/v2.6/patch-%{version}.bz2
-# Source1-md5:	6cac5e59d5562b591cdda485941204d5
-%endif
 Source2:	kernel-xen0-module-build.pl
 Source3:	kernel-config.py
 Source4:	kernel-config-update.py
@@ -390,12 +384,9 @@ ln -s %{SOURCE4} kernel-config-update.py
 ln -s %{SOURCE5} Makefile
 
 cd linux-%{basever}
-%if "%{postver}" != "%{nil}"
-%{__bzip2} -dc %{SOURCE1} | %{__patch} -p1 -s
-%endif
 
 # Fix EXTRAVERSION in main Makefile
-sed -i 's#EXTRAVERSION =.*#EXTRAVERSION = %{postver}_%{alt_kernel}#g' Makefile
+sed -i 's#EXTRAVERSION =.*#EXTRAVERSION = _%{alt_kernel}#g' Makefile
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' -o -name '.gitignore' ')' -print0 | xargs -0 -r -l512 rm -f
