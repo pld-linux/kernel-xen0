@@ -12,7 +12,7 @@
 %bcond_without	source		# don't build kernel-source package
 %bcond_with	verbose		# verbose build (V=1)
 %bcond_with	pae		# build PAE (HIGHMEM64G) support on uniprocessor
-%bcond_with	preempt-nort	# build preemptable no realtime kernel
+%bcond_with	preempt_nort	# build preemptable no realtime kernel
 
 %{?debug:%define with_verbose 1}
 
@@ -389,7 +389,7 @@ Q			:= %{!?with_verbose:@}
 MAKE_OPTS	:= %{MakeOpts}
 
 CONFIGS += %{_sourcedir}/kernel-xen0-multiarch.conf
-%if %{with preempt-nort}
+%if %{with preempt_nort}
 CONFIGS += %{_sourcedir}/kernel-xen0-preempt-nort.config
 %else
 CONFIGS += %{_sourcedir}/kernel-xen0-no-preempt-nort.config
